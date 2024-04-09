@@ -6,14 +6,14 @@ pipeline {
     stages { 
         stage('Build docker image') {
             steps {  
-                node {
+                node('any') {
                     sh 'docker build -t vatsraj/pythonapp:$BUILD_NUMBER .'
                 }
             }
         }
         stage('login to dockerhub') {
-            steps{
-                node {
+            steps {
+                node('any') {
                     withCredentials([usernamePassword(credentialsId: 'kapilgurjar', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin"
                     }
@@ -21,18 +21,12 @@ pipeline {
             }
         }
         stage('push image') {
-            steps{
-                node {
+            steps {
+                node('any') {
                     sh 'docker push vatsraj/pythonapp:$BUILD_NUMBER'
                 }
             }
         }
     }
     post {
-        always {
-            node {
-                sh 'docker logout'
-            }
-        }
-    }
-}
+        alway
