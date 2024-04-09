@@ -29,4 +29,10 @@ pipeline {
         }
     }
     post {
-        alway
+        always {
+            node('any') {
+                sh 'docker logout'
+            }
+        }
+    }
+}
