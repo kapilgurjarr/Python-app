@@ -1,38 +1,29 @@
 pipeline {
-    agent any
+    agent any 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('kapilgurjar')
+    DOCKERHUB_CREDENTIALS = credentials('kapilgurjar-dockerhub')
     }
-    stages {
+    stages { 
+
         stage('Build docker image') {
-            steps {
-                script {
-                    docker.build("vatsraj/pythonapp:$BUILD_NUMBER")
-                }
+            steps {  
+                sh ' docker build -t vatsraj/pythonapp:$BUILD_NUMBER .'
             }
         }
-        stage('Login to DockerHub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'kapilgurjar', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    }
-                }
+        stage('login to dockerhub') {
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('Push image') {
-            steps {
-                script {
-                    sh 'docker push vatsraj/pythonapp:$BUILD_NUMBER'
-                }
+        stage('push image') {
+            steps{
+                sh ' docker push vatsraj/pythonapp:$BUILD_NUMBER'
             }
         }
-    }
-    post {
+}
+post {
         always {
-            script {
-                sh 'docker logout'
-            }
+            sh 'docker logout'
         }
     }
 }
