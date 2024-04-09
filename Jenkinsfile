@@ -6,25 +6,33 @@ pipeline {
     stages { 
         stage('Build docker image') {
             steps {  
-                sh 'docker build -t vatsraj/pythonapp:$BUILD_NUMBER .'
+                node {
+                    sh 'docker build -t vatsraj/pythonapp:$BUILD_NUMBER .'
+                }
             }
         }
         stage('login to dockerhub') {
             steps{
-                withCredentials([usernamePassword(credentialsId: 'kapilgurjar', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin"
+                node {
+                    withCredentials([usernamePassword(credentialsId: 'kapilgurjar', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin"
+                    }
                 }
             }
         }
         stage('push image') {
             steps{
-                sh 'docker push vatsraj/pythonapp:$BUILD_NUMBER'
+                node {
+                    sh 'docker push vatsraj/pythonapp:$BUILD_NUMBER'
+                }
             }
         }
     }
     post {
         always {
-            sh 'docker logout'
+            node {
+                sh 'docker logout'
+            }
         }
     }
 }
